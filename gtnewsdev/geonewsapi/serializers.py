@@ -31,7 +31,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'title', 'url', 'keywords', 'authors', 'retweetcounts')
+        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'url', 'keywords', 'authors', 'retweetcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):

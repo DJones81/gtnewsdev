@@ -4,7 +4,8 @@ from django.contrib.gis.db import models
 class Article(models.Model):
     date = models.DateTimeField()
     coords = models.GeometryField()
-    title = models.CharField(max_length=200)
+    headline = models.CharField(max_length=200)
+    abstract = model.CharField(max_length=2000)
     url = models.URLField(max_length=300)
 
     objects = models.GeoManager()
