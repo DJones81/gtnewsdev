@@ -13,7 +13,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
-    word_fields = ('title','keywords__keyword','authors__first','authors__last')
+    word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True
 
