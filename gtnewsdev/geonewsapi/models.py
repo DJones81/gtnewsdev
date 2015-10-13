@@ -12,7 +12,7 @@ class Article(models.Model):
 
     # Returns the string representation of the model.
     def __str__(self):              # __unicode__ on Python 2
-        return self.title
+        return self.headline
 
 class Keyword(models.Model):
     article = models.ForeignKey(Article, related_name='keywords', on_delete=models.CASCADE)
