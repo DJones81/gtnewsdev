@@ -5,7 +5,7 @@ class Article(models.Model):
     date = models.DateTimeField()
     coords = models.GeometryField()
     headline = models.CharField(max_length=200)
-    abstract = models.CharField(max_length=2000)
+    abstract = models.CharField(max_length=2000, blank=True)
     url = models.URLField(max_length=300)
 
     objects = models.GeoManager()
