@@ -16,7 +16,7 @@ class Article(models.Model):
 
 class Keyword(models.Model):
     article = models.ForeignKey(Article, related_name='keywords', on_delete=models.CASCADE)
-    keyword = models.CharField(max_length=30)
+    keyword = models.CharField(max_length=80)
 
     def __unicode__(self):
         return '%s' % (self.keyword)
