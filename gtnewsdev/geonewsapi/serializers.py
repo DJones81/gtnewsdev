@@ -54,12 +54,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         keywordlist = validated_data.pop('keywords')
         authorlist = validated_data.pop('authors')
         retweetcountlist = validated_data.pop('retweetcounts')
-        logger.error('instance:')
-        logger.error(instance)
-        logger.error('validated_data:')
-        logger.error(validated_data)
-        logger.error('keywords')
-        logger.error(keywordlist)
+#        logger.error('instance:')
+#        logger.error(instance)
+#        logger.error('validated_data:')
+#        logger.error(validated_data)
+#        logger.error('keywords')
+#        logger.error(keywordlist)
 #        instance.update(title='BBBB');
         Article.objects.filter(pk=instance.id).update(**validated_data)
         keywords = [keyword['keyword'] for keyword in keywordlist]
