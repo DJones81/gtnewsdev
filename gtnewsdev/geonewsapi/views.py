@@ -6,14 +6,33 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
 
+from django_filters import FilterSet, DateTimeFilter
+
 from gtnewsdev.geonewsapi.models import Article
-from gtnewsdev.geonewsapi.serializers import ArticleSerializer
+from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
+
+class ArticleDateFilter(FilterSet):
+    start_date = DateTimeFilter(name='date',lookup_type='gte')
+    end_date = DateTimeFilter(name='date',lookup_type='lte')
+
+    class Meta:
+        model = Article
+        fields = ['start_date', 'end_date']
 
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.distinct()
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
+    filter_class = ArticleDateFilter
+    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
+    bbox_filter_include_overlapping = True
+
+class PinViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Article.objects.distinct()
+    serializer_class = PinSerializer
+    word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
+    filter_class = ArticleDateFilter
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True
 

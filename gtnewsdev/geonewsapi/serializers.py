@@ -82,3 +82,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         for retweetcount in retweetcountlist:
             RetweetCount.objects.get_or_create(article=instance, **retweetcount)
         return instance
+
+class PinSerializer(serializers.ModelSerializer):
+    coords = geoserializers.GeometryField(label=('coordinates'))
+    # retweetcount = serializers.SlugRelatedField(
+    #         queryset=Article.objects.retweetcounts.latest('date'),
+    #         read_only=true,
+    #         slug_field='retweetcount'
+    #     )
+
+    class Meta:
+        model = Article
+        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'url')
+        geo_field = 'coords'
