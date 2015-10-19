@@ -10,7 +10,7 @@ from gtnewsdev.geonewsapi.models import Article
 from gtnewsdev.geonewsapi.serializers import ArticleSerializer
 
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
+    queryset = Article.objects.distinct()
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
