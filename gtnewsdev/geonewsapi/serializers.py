@@ -1,6 +1,7 @@
 from gtnewsdev.geonewsapi.models import Article, Keyword, Author, RetweetCount
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
+from django.contrib.gis import geos
 
 # import the logging library
 import logging
@@ -28,10 +29,11 @@ class ArticleSerializer(serializers.ModelSerializer):
     keywords = KeywordSerializer(many=True)
     authors = AuthorSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
+    category = serializers.CharField(source='articlecategory')
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'category', 'url', 'keywords', 'authors', 'retweetcounts')
+        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'category', 'url', 'retweetcount', 'keywords', 'authors', 'retweetcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):
@@ -85,6 +87,21 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 class PinSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
+    category = serializers.SerializerMethodField('category_map')
+    isgeolocated = serializers.SerializerMethodField('islocated')
+
+    def category_map(self, article):
+        return {
+            'Science': 'Science',
+            'Health': 'Health',
+            'Job Market': 'Economy',
+            'World': 'World',
+            'Conflict': 'Workplace'
+        }.get(article.articlecategory, 'Miscellaneous')
+
+    def islocated(self, article):
+        return not article.coords.equals(geos.Point(0,0))
+
     # retweetcount = serializers.SlugRelatedField(
     #         queryset=Article.objects.retweetcounts.latest('date'),
     #         read_only=true,
@@ -93,5 +110,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'url')
+        fields = ('pk', 'date', 'coords', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount')
         geo_field = 'coords'

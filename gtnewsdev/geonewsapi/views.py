@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.decorators import detail_route, list_route
 from rest_framework.filters import DjangoFilterBackend
 from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
@@ -28,11 +29,17 @@ class ArticleViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True
 
+    # @list_route(methods=['get'], serializer_class=PinSerializer)
+    # def pins(self, request):
+    #     serializer = self.get_serializer(self.list(request).get_queryset(), many=True)
+    #     return Response(serializer.data)
+
 class PinViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Article.objects.distinct()
     serializer_class = PinSerializer
     word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
     filter_class = ArticleDateFilter
+    filter_fields = ('isgeolocated')
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True
 

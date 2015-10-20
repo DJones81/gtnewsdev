@@ -6,8 +6,9 @@ class Article(models.Model):
     coords = models.GeometryField()
     headline = models.CharField(max_length=200)
     abstract = models.CharField(max_length=500, blank=True)
-    category = models.CharField(max_length=28)
+    articlecategory = models.CharField(max_length=28)
     url = models.URLField(max_length=300)
+    retweetcount = models.IntegerField()
 
     objects = models.GeoManager()
 
