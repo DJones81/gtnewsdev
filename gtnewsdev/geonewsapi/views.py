@@ -21,7 +21,7 @@ class ArticleDateFilter(FilterSet):
         fields = ['start_date', 'end_date']
 
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.distinct()
+    queryset = Article.objects.distinct('url')
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
@@ -35,7 +35,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 class PinViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Article.objects.distinct()
+    queryset = Article.objects.distinct('url')
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
