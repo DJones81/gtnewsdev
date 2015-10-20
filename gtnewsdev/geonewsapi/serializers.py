@@ -89,6 +89,7 @@ class PinSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     category = serializers.SerializerMethodField('category_map')
     isgeolocated = serializers.SerializerMethodField('islocated')
+    authors = AuthorSerializer(many=True)
 
     def category_map(self, article):
         return {
@@ -110,5 +111,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount')
+        fields = ('pk', 'date', 'coords', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount', 'authors')
         geo_field = 'coords'
