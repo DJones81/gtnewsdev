@@ -86,22 +86,28 @@ class ArticleSerializer(serializers.ModelSerializer):
         return instance
 
 class PinSerializer(serializers.ModelSerializer):
+
     coords = geoserializers.GeometryField(label=('coordinates'))
     category = serializers.SerializerMethodField('category_map')
     isgeolocated = serializers.SerializerMethodField('islocated')
+    pinsize = serializers.SerializerMethodField('size')
     authors = AuthorSerializer(many=True)
 
     def category_map(self, article):
         return {
-            'Science': 'Science',
-            'Health': 'Health',
-            'Job Market': 'Economy',
-            'World': 'World',
-            'Conflict': 'Workplace'
-        }.get(article.articlecategory, 'Miscellaneous')
+            'Science': 'science',
+            'Health': 'health',
+            'Job Market': 'economy',
+            'World': 'world',
+            'Workplace': 'conflict'
+        }.get(article.articlecategory, 'world')
 
     def islocated(self, article):
         return not article.coords.equals(geos.Point(0,0))
+
+    def size(self, article):
+        return 1
+
 
     # retweetcount = serializers.SlugRelatedField(
     #         queryset=Article.objects.retweetcounts.latest('date'),
@@ -111,5 +117,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount', 'authors')
+        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount', 'authors')
         geo_field = 'coords'
