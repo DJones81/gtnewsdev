@@ -24,7 +24,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.distinct('url')
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
-    word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
+    word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
     filter_class = ArticleDateFilter
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True
@@ -38,7 +38,7 @@ class PinViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Article.objects.distinct('url')
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
-    word_fields = ('headline','abstract','keywords__keyword','authors__first','authors__last')
+    word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
     filter_class = ArticleDateFilter
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
     bbox_filter_include_overlapping = True

@@ -1,4 +1,4 @@
-from gtnewsdev.geonewsapi.models import Article, Keyword, Author, RetweetCount
+from gtnewsdev.geonewsapi.models import Article, Keyword, RetweetCount
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 from django.contrib.gis import geos
@@ -14,10 +14,10 @@ class KeywordSerializer(serializers.ModelSerializer):
         model = Keyword
         fields = ('keyword', )
 
-class AuthorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Author
-        fields = ('first', 'last')
+# class AuthorSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Author
+#         fields = ('first', 'last')
 
 class RetweetCountSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,25 +27,25 @@ class RetweetCountSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     keywords = KeywordSerializer(many=True)
-    authors = AuthorSerializer(many=True)
+    # authors = AuthorSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
     category = serializers.CharField(source='articlecategory')
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'category', 'url', 'retweetcount', 'keywords', 'authors', 'retweetcounts')
+        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'keywords', 'retweetcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):
 #        print >>sys.stderr, validated_data
         keywords_data = validated_data.pop('keywords')
-        authors_data = validated_data.pop('authors')
+        # authors_data = validated_data.pop('authors')
         retweetcounts_data = validated_data.pop('retweetcounts')
         article = Article.objects.create(**validated_data)
         for keyword_data in keywords_data:
             Keyword.objects.create(article=article, **keyword_data)
-        for author_data in authors_data:
-            Author.objects.create(article=article, **author_data)
+        # for author_data in authors_data:
+            # Author.objects.create(article=article, **author_data)
         for retweetcount_data in retweetcounts_data:
             RetweetCount.objects.create(article=article, **retweetcount_data)
         return article
@@ -54,7 +54,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 #        print >>sys.stderr, instance
 #        print >>sys.stderr, validated_data
         keywordlist = validated_data.pop('keywords')
-        authorlist = validated_data.pop('authors')
+        # authorlist = validated_data.pop('authors')
         retweetcountlist = validated_data.pop('retweetcounts')
 #        logger.error('instance:')
 #        logger.error(instance)
@@ -70,13 +70,13 @@ class ArticleSerializer(serializers.ModelSerializer):
                 Keyword.objects.get(pk=keyword.id).delete()
         for keyword in keywordlist:
             Keyword.objects.get_or_create(article=instance, **keyword)
-        authorsfirsts = [author['first'] for author in authorlist]
-        authorslasts = [author['last'] for author in authorlist]
-        for author in instance.authors.all():
-            if not (author.first in authorsfirsts and author.last in authorslasts):
-                Author.objects.get(pk=author.id).delete()
-        for author in authorlist:
-            Author.objects.get_or_create(article=instance, **author)
+        # authorsfirsts = [author['first'] for author in authorlist]
+        # authorslasts = [author['last'] for author in authorlist]
+        # for author in instance.authors.all():
+        #     if not (author.first in authorsfirsts and author.last in authorslasts):
+        #         Author.objects.get(pk=author.id).delete()
+        # for author in authorlist:
+        #     Author.objects.get_or_create(article=instance, **author)
         retweetcounts = [retweetcount['retweetcount'] for retweetcount in retweetcountlist]
         for retweetcount in instance.retweetcounts.all():
             if retweetcount.retweetcount not in retweetcounts:
@@ -86,12 +86,11 @@ class ArticleSerializer(serializers.ModelSerializer):
         return instance
 
 class PinSerializer(serializers.ModelSerializer):
-
     coords = geoserializers.GeometryField(label=('coordinates'))
     category = serializers.SerializerMethodField('category_map')
     isgeolocated = serializers.SerializerMethodField('islocated')
     pinsize = serializers.SerializerMethodField('size')
-    authors = AuthorSerializer(many=True)
+    # authors = AuthorSerializer(many=True)
 
     def category_map(self, article):
         return {
@@ -117,5 +116,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'url', 'category', 'retweetcount', 'authors')
+        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount')
         geo_field = 'coords'
