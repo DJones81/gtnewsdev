@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^geonewsapi/', include('gtnewsdev.geonewsapi.urls')),
+    url(r'^', include('gtnewsdev.geonewsapi.urls')),
 #    url(r'^admin/', include(admin.site.urls)),
 )
 
