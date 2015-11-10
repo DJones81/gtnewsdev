@@ -7,7 +7,7 @@ from rest_framework.filters import DjangoFilterBackend
 from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
 
-from django_filters import FilterSet, DateTimeFilter
+from django_filters import FilterSet, DateTimeFilter, NumberFilter
 
 from gtnewsdev.geonewsapi.models import Article
 from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
@@ -15,8 +15,8 @@ from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
 class ArticleFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
-    min_retweet = IntegerFilter(name='retweetcount',lookup_type='gte')
-    min_sharecount = IntegerFilter(name='sharecount',lookup_type='gte')
+    min_retweet = NumberFilter(name='retweetcount',lookup_type='gte')
+    min_sharecount = NumberFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
@@ -25,8 +25,8 @@ class ArticleFilter(FilterSet):
 class PinFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
-    min_retweet = IntegerFilter(name='retweetcount',lookup_type='gte')
-    min_sharecount = IntegerFilter(name='sharecount',lookup_type='gte')
+    min_retweet = NumberFilter(name='retweetcount',lookup_type='gte')
+    min_sharecount = NumberFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
@@ -47,7 +47,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 class PinViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Article.objects.distinct('url')
+    queryset = Article.objects.distinct('url').exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }")
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')

@@ -1,4 +1,4 @@
-from gtnewsdev.geonewsapi.models import Article, Keyword, RetweetCount
+from gtnewsdev.geonewsapi.models import Article, Keyword, RetweetCount, FacebookCount
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 from django.contrib.gis import geos
@@ -94,7 +94,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 class PinSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     category = serializers.SerializerMethodField('category_map')
-    isgeolocated = serializers.SerializerMethodField('islocated')
+    #isgeolocated = serializers.SerializerMethodField('islocated')
     pinsize = serializers.SerializerMethodField('size')
     # authors = AuthorSerializer(many=True)
 
@@ -107,8 +107,8 @@ class PinSerializer(serializers.ModelSerializer):
             'Workplace': 'conflict'
         }.get(article.articlecategory, 'world')
 
-    def islocated(self, article):
-        return not article.coords.equals(geos.Point(0,0))
+    #def islocated(self, article):
+    #    return not article.coords.equals(geos.Point(0,0))
 
     def size(self, article):
         return 1
@@ -122,5 +122,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount', 'sharecount')
+        fields = ('pk', 'date', 'coords', 'pinsize', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount', 'sharecount')
         geo_field = 'coords'
