@@ -87,18 +87,21 @@ class ArticleSerializer(serializers.ModelSerializer):
         #         Author.objects.get(pk=author.id).delete()
         # for author in authorlist:
         #     Author.objects.get_or_create(article=instance, **author)
-        retweetcountdates = [retweetcount['date'] for retweetcount in retweetcountlist]
-        for retweetcount in instance.retweetcounts.all():
-            if retweetcount.date not in retweetcountdates:
-                RetweetCount.objects.get(pk=retweetcount.id).delete()
+        retweetcountids = []
         for retweetcount in retweetcountlist:
-            RetweetCount.objects.get_or_create(article=instance, **retweetcount)
-        facebookcountdates = [facebookcount['date'] for facebookcount in facebookcountlist]
-        for facebookcount in instance.retweetcounts.all():
-            if facebookcount.date not in facebookcountdates:
-                FacebookCount.objects.get(pk=facebookcount.id).delete()
+            retweetcountobj, created = RetweetCount.objects.get_or_create(article=instance, **retweetcount)
+            retweetcountids.append(retweetcountobj.id)
+        for retweetcount in instance.retweetcounts.all():
+            if retweetcount.id not in retweetcountids:
+                RetweetCount.objects.get(pk=retweetcount.id).delete()
+
+        facebookcountids = []
         for facebookcount in facebookcountlist:
-            FacebookCount.objects.get_or_create(article=instance, **facebookcount)
+            facebookcountobj, created = FacebookCount.objects.get_or_create(article=instance, **facebookcount)
+            facebookcountids.append(facebookcountobj.id)
+        for facebookcount in instance.facebookcounts.all():
+            if facebookcount.id not in facebookcountids:
+                FacebookCount.objects.get(pk=facebookcount.id).delete()
         return instance
 
 class PinSerializer(serializers.ModelSerializer):
