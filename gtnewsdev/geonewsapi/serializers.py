@@ -43,7 +43,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         geo_field = 'coords'
 
     def create(self, validated_data):
-#        print >>sys.stderr, validated_data
+        # print >>sys.stderr, validated_data
         keywords_data = validated_data.pop('keywords')
         # authors_data = validated_data.pop('authors')
         retweetcounts_data = validated_data.pop('retweetcounts')
@@ -55,7 +55,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             # Author.objects.create(article=article, **author_data)
         for retweetcount_data in retweetcounts_data:
             RetweetCount.objects.create(article=article, **retweetcount_data)
-        for facebookcount_data in retweetcounts_data:
+        for facebookcount_data in facebookcounts_data:
             FacebookCount.objects.create(article=article, **facebookcount_data)
         return article
 
