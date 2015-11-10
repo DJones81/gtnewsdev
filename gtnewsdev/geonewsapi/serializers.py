@@ -24,16 +24,22 @@ class RetweetCountSerializer(serializers.ModelSerializer):
         model = RetweetCount
         fields = ('date', 'retweetcount')
 
+class FacebookCountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FacebookCount
+        fields = ('date', 'likecount', 'commentcount', 'sharecount', 'clickcount')
+
 class ArticleSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     keywords = KeywordSerializer(many=True)
     # authors = AuthorSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
+    facebookcounts = FacebookCountSerializer(many=True)
     category = serializers.CharField(source='articlecategory')
 
     class Meta:
         model = Article
-        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'keywords', 'retweetcounts')
+        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'sharecount', 'keywords', 'retweetcounts', 'facebookcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):
@@ -116,5 +122,5 @@ class PinSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount')
+        fields = ('pk', 'date', 'coords', 'pinsize', 'isgeolocated', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount', 'sharecount')
         geo_field = 'coords'

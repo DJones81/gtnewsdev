@@ -11,7 +11,7 @@ class Article(models.Model):
     articlecategory = models.CharField(max_length=28)
     url = models.URLField(max_length=300, unique=True)
     retweetcount = models.IntegerField()
-
+    sharecount = models.IntegerField()
     objects = models.GeoManager()
 
     # Returns the string representation of the model.
@@ -37,6 +37,17 @@ class RetweetCount(models.Model):
     article = models.ForeignKey(Article, related_name='retweetcounts', on_delete=models.CASCADE)
     date = models.DateTimeField(default=datetime.date.today)
     retweetcount = models.IntegerField()
+
+    def __unicode__(self):
+        return '%s: %d' % (self.date, self.retweetcount)
+
+class FacebookCount(models.Model):
+    article = models.ForeignKey(Article, related_name='facebookcounts', on_delete=models.CASCADE)
+    date = models.DateTimeField(default=datetime.date.today)
+    likecount = models.IntegerField()
+    commentcount = models.IntegerField()
+    sharecount = models.IntegerField()
+    clickcount = models.IntegerField()
 
     def __unicode__(self):
         return '%s: %d' % (self.date, self.retweetcount)

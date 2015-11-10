@@ -15,18 +15,22 @@ from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
 class ArticleFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
+    min_retweet = IntegerFilter(name='retweetcount',lookup_type='gte')
+    min_sharecount = IntegerFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date', 'sourceid', 'url']
+        fields = ['start_date', 'end_date', 'sourceid', 'url', 'min_retweet', 'min_sharecount']
 
 class PinFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
+    min_retweet = IntegerFilter(name='retweetcount',lookup_type='gte')
+    min_sharecount = IntegerFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date']
+        fields = ['start_date', 'end_date', 'min_retweet', 'min_sharecount']
 
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.distinct('url')
