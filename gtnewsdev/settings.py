@@ -78,7 +78,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework_filters.backends.DjangoFilterBackend',
 #        'rest_framework_gis.filters.InBBoxFilter',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
 }
 
 WSGI_APPLICATION = 'gtnewsdev.wsgi.application'

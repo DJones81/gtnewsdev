@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
-from rest_framework.filters import DjangoFilterBackend
+from rest_framework.filters import DjangoFilterBackend,  OrderingFilter
 from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
 
@@ -15,30 +15,31 @@ from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
 class ArticleFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
-    min_retweet = NumberFilter(name='retweetcount',lookup_type='gte')
+    min_retweetcount = NumberFilter(name='retweetcount',lookup_type='gte')
     min_sharecount = NumberFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date', 'sourceid', 'url', 'min_retweet', 'min_sharecount']
+        fields = ['start_date', 'end_date', 'sourceid', 'url', 'min_retweetcount', 'min_sharecount']
 
 class PinFilter(FilterSet):
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
-    min_retweet = NumberFilter(name='retweetcount',lookup_type='gte')
+    min_retweetcount = NumberFilter(name='retweetcount',lookup_type='gte')
     min_sharecount = NumberFilter(name='sharecount',lookup_type='gte')
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date', 'min_retweet', 'min_sharecount']
+        fields = ['start_date', 'end_date', 'min_retweetcount', 'min_sharecount']
 
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.distinct('url')
+    queryset = Article.objects
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
     filter_class = ArticleFilter
-    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
+    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
+    ordering_fields = ('retweetcount', 'sharecount', 'date')
     bbox_filter_include_overlapping = True
 
     # @list_route(methods=['get'], serializer_class=PinSerializer)
@@ -47,12 +48,13 @@ class ArticleViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 class PinViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Article.objects.distinct('url').exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }")
+    queryset = Article.objects.exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }")
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
     filter_class = PinFilter
-    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, )
+    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
+    ordering_fields = ('retweetcount', 'sharecount', 'date')
     bbox_filter_include_overlapping = True
 
 #@api_view(['GET', 'POST'])
