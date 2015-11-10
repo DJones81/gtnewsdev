@@ -39,7 +39,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
     filter_class = ArticleFilter
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
-    ordering_fields = ('retweetcount', 'sharecount', 'date')
+    ordering_fields = ('retweetcount', 'sharecount', 'date', 'id')
     bbox_filter_include_overlapping = True
 
     # @list_route(methods=['get'], serializer_class=PinSerializer)
