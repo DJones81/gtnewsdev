@@ -3,11 +3,8 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 from django.contrib.gis import geos
 
-# import the logging library
-import logging
-
-# Get an instance of a logger
-logger = logging.getLogger(__name__)
+import math
+# from pprint import pprint
 
 class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -120,11 +117,25 @@ class PinSerializer(serializers.ModelSerializer):
             'Workplace': 'conflict'
         }.get(article.articlecategory, 'world')
 
-    #def islocated(self, article):
-    #    return not article.coords.equals(geos.Point(0,0))
-
     def size(self, article):
-        return 1
+        # pprint(getattr(self.context['view'], 'max_retweetcount'))
+        statcounts = getattr(self.context['view'], 'statcounts')
+        # pprint(statcounts)
+        pinsize = {}
+        pinsize['twitter'] = math.ceil(9*(article.retweetcount-statcounts['retweet']['min'])/statcounts['retweet']['maxmin'])+1
+        pinsize['facebook'] = math.ceil(9*(article.sharecount-statcounts['share']['min'])/statcounts['share']['maxmin'])+1
+        pinsize['both'] = math.ceil(9*((article.retweetcount+article.sharecount)-statcounts['both']['min'])/statcounts['both']['maxmin'])+1
+        # pprint(vars(self))
+        # pprint(vars(self.context['request']))
+        # pprint(vars(self.context['view'].request))
+        # print(self.context['request'] == self.context['view'].request)
+        # pprint(getattr(self.context['view'], 'max_retweetcount'))
+        # pprint(self.context['view'].filter_queryset(self.context['view'].queryset).aggregate(Max('retweetcount')))
+        # print('\nsize ')
+        # print(self.context['request'].GET)
+        # print(self.context[''])
+        # print(Article.objects.filter(self.context['request'].GET))
+        return pinsize
 
 
     # retweetcount = serializers.SlugRelatedField(
