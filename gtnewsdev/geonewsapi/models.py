@@ -27,7 +27,7 @@ class Keyword(models.Model):
 
 class Image(models.Model):
     article = models.ForeignKey(Article, related_name='images', on_delete=models.CASCADE)
-    url = models.URLField(max_length=200)
+    url = models.URLField(max_length=500)
 
     def __unicode__(self):
         return '%s' % (self.keyword)
