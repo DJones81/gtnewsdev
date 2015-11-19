@@ -1,4 +1,4 @@
-from gtnewsdev.geonewsapi.models import Article, Keyword, RetweetCount, FacebookCount
+from gtnewsdev.geonewsapi.models import Article, Keyword, Image, RetweetCount, FacebookCount
 from rest_framework import serializers
 from rest_framework_gis import serializers as geoserializers
 from django.contrib.gis import geos
@@ -10,6 +10,12 @@ class KeywordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Keyword
         fields = ('keyword', )
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
+        fields = ('url', )
+
 
 # class AuthorSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -29,6 +35,7 @@ class FacebookCountSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     keywords = KeywordSerializer(many=True)
+    images = ImageSerializer(many=True)
     # authors = AuthorSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
     facebookcounts = FacebookCountSerializer(many=True)
@@ -36,18 +43,21 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'sharecount', 'keywords', 'retweetcounts', 'facebookcounts')
+        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'sharecount', 'keywords', 'images', 'retweetcounts', 'facebookcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):
         # print >>sys.stderr, validated_data
         keywords_data = validated_data.pop('keywords')
+        images_data = validated_data.pop('images')
         # authors_data = validated_data.pop('authors')
         retweetcounts_data = validated_data.pop('retweetcounts')
         facebookcounts_data = validated_data.pop('facebookcounts')
         article = Article.objects.create(**validated_data)
         for keyword_data in keywords_data:
             Keyword.objects.create(article=article, **keyword_data)
+        for image_data in images_data:
+            Image.objects.create(article=article, **image_data)
         # for author_data in authors_data:
             # Author.objects.create(article=article, **author_data)
         for retweetcount_data in retweetcounts_data:
@@ -60,6 +70,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 #        print >>sys.stderr, instance
 #        print >>sys.stderr, validated_data
         keywordlist = validated_data.pop('keywords')
+        imagelist = validated_data.pop('images')
         # authorlist = validated_data.pop('authors')
         retweetcountlist = validated_data.pop('retweetcounts')
         facebookcountlist = validated_data.pop('facebookcounts')
@@ -77,6 +88,13 @@ class ArticleSerializer(serializers.ModelSerializer):
                 Keyword.objects.get(pk=keyword.id).delete()
         for keyword in keywordlist:
             Keyword.objects.get_or_create(article=instance, **keyword)
+
+        images = [image['image'] for image in imagelist]
+        for image in instance.images.all():
+            if image.image not in images:
+                Image.objects.get(pk=image.id).delete()
+        for image in imagelist:
+            Image.objects.get_or_create(article=instance, **image)
         # authorsfirsts = [author['first'] for author in authorlist]
         # authorslasts = [author['last'] for author in authorlist]
         # for author in instance.authors.all():

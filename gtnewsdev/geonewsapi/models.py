@@ -25,6 +25,13 @@ class Keyword(models.Model):
     def __unicode__(self):
         return '%s' % (self.keyword)
 
+class Image(models.Model):
+    article = models.ForeignKey(Article, related_name='images', on_delete=models.CASCADE)
+    url = models.URLField(max_length=200)
+
+    def __unicode__(self):
+        return '%s' % (self.keyword)
+
 # class Author(models.Model):
 #     article = models.ForeignKey(Article, related_name='authors', on_delete=models.CASCADE)
 #     first = models.CharField(max_length=30)
