@@ -89,7 +89,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         for keyword in keywordlist:
             Keyword.objects.get_or_create(article=instance, **keyword)
 
-        images = [image['image'] for image in imagelist]
+        images = [image['url'] for image in imagelist]
         for image in instance.images.all():
             if image.image not in images:
                 Image.objects.get(pk=image.id).delete()
