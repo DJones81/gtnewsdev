@@ -140,9 +140,9 @@ class PinSerializer(serializers.ModelSerializer):
         statcounts = getattr(self.context['view'], 'statcounts')
         # pprint(statcounts)
         pinsize = {}
-        pinsize['twitter'] = 0.9*(article.retweetcount-statcounts['retweet']['min'])/statcounts['retweet']['maxmin']+0.1
-        pinsize['facebook'] = 0.9*(article.sharecount-statcounts['share']['min'])/statcounts['share']['maxmin']+0.1
-        pinsize['both'] = 0.9*((article.retweetcount+article.sharecount)-statcounts['both']['min'])/statcounts['both']['maxmin']+0.1
+        pinsize['twitter'] = 0.8*(article.retweetcount/statcounts['retweet']['max'])+0.2 #0.9*(article.retweetcount-statcounts['retweet']['min'])/statcounts['retweet']['maxmin']+0.1
+        pinsize['facebook'] = 0.8*(article.sharecount/statcounts['share']['max'])+0.2 #0.9*(article.sharecount-statcounts['share']['min'])/statcounts['share']['maxmin']+0.1
+        pinsize['both'] = 0.8*((article.retweetcount+article.sharecount)/statcounts['both']['max'])+0.2 #0.9*((article.retweetcount+article.sharecount)-statcounts['both']['min'])/statcounts['both']['maxmin']+0.1
         # pprint(vars(self))
         # pprint(vars(self.context['request']))
         # pprint(vars(self.context['view'].request))

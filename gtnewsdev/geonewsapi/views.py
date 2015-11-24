@@ -76,16 +76,16 @@ class PinViewSet(viewsets.ReadOnlyModelViewSet):
         resultant = self.filter_queryset(self.queryset)
         statcounts = {'retweet': {}, 'share': {}, 'both': {}}
 
-        statcounts['retweet']['min'] = resultant.aggregate(Min('retweetcount'))['retweetcount__min']
-        statcounts['share']['min'] = resultant.aggregate(Min('sharecount'))['sharecount__min']
-        statcounts['both']['min'] = resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Min('sum'))['sum__min']
+        statcounts['retweet']['max'] = resultant.aggregate(Max('retweetcount'))['retweetcount__max']
+        statcounts['share']['max'] = resultant.aggregate(Max('sharecount'))['sharecount__max']
+        statcounts['both']['max'] = resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Max('sum'))['sum__max']
 
-        maxmin_retweetcount = resultant.aggregate(Max('retweetcount'))['retweetcount__max']-resultant.aggregate(Min('retweetcount'))['retweetcount__min']
-        statcounts['retweet']['maxmin'] = maxmin_retweetcount if (maxmin_retweetcount!=0) else 1
-        maxmin_sharecount = resultant.aggregate(Max('sharecount'))['sharecount__max']-resultant.aggregate(Min('sharecount'))['sharecount__min']
-        statcounts['share']['maxmin'] = maxmin_sharecount if (maxmin_sharecount!=0) else 1
-        maxmin_both = resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Max('sum'))['sum__max']-resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Min('sum'))['sum__min']
-        statcounts['both']['maxmin'] = maxmin_both if (maxmin_both!=0) else 1
+        # maxmin_retweetcount = resultant.aggregate(Max('retweetcount'))['retweetcount__max']-resultant.aggregate(Min('retweetcount'))['retweetcount__min']
+        # statcounts['retweet']['maxmin'] = maxmin_retweetcount if (maxmin_retweetcount!=0) else 1
+        # maxmin_sharecount = resultant.aggregate(Max('sharecount'))['sharecount__max']-resultant.aggregate(Min('sharecount'))['sharecount__min']
+        # statcounts['share']['maxmin'] = maxmin_sharecount if (maxmin_sharecount!=0) else 1
+        # maxmin_both = resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Max('sum'))['sum__max']-resultant.annotate(sum=F('retweetcount') + F('sharecount')).aggregate(Min('sum'))['sum__min']
+        # statcounts['both']['maxmin'] = maxmin_both if (maxmin_both!=0) else 1
         
         # min_retweetcount = resultant.aggregate(Min('retweetcount'))['retweetcount__min']
         # statcounts['retweet'] = min_retweetcount if (min_retweetcount!=0) else 1
