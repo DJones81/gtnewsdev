@@ -35,7 +35,7 @@ class PinFilter(FilterSet):
         fields = ['start_date', 'end_date', 'min_retweetcount', 'min_sharecount']
 
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects
+    queryset = Article.objects.distinct()
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
@@ -50,7 +50,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 class PinViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Article.objects.exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }")
+    queryset = Article.objects.exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }").distinct()
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
     word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
