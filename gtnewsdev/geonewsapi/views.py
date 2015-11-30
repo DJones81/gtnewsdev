@@ -14,7 +14,10 @@ from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
 
 from django.db.models import Max, Min, F # Avg, StdDev
 
+from pprint import pprint
+
 class ArticleFilter(FilterSet):
+
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
     min_retweetcount = NumberFilter(name='retweetcount',lookup_type='gte')
@@ -58,6 +61,15 @@ class PinViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
     ordering_fields = ('retweetcount', 'sharecount', 'date')
     bbox_filter_include_overlapping = True
+
+    def get_queryset(self):
+        query_params = self.request.query_params.copy()
+        start_date = query_params.get('start_date', '').replace('T',' ').replace('Z','')
+        end_date = query_params.get('end_date', '').replace('T',' ').replace('Z','')
+        query_params.__setitem__('start_date', start_date)
+        query_params.__setitem__('end_date', end_date)
+        self.request._request.GET = query_params
+        return self.queryset
 
     def get_serializer(self, *args, **kwargs):
         # kwargs.update(self.serializer_kwargs)
