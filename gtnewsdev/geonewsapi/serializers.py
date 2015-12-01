@@ -32,11 +32,10 @@ class ArticleSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
     facebookcounts = FacebookCountSerializer(many=True)
-    category = serializers.CharField(source='articlecategory')
 
     class Meta:
         model = Article
-        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'url', 'retweetcount', 'sharecount', 'keywords', 'images', 'retweetcounts', 'facebookcounts')
+        fields = ('pk', 'sourceid', 'date', 'coords', 'headline', 'abstract', 'byline', 'category', 'sectionname', 'url', 'retweetcount', 'sharecount', 'keywords', 'images', 'retweetcounts', 'facebookcounts')
         geo_field = 'coords'
 
     def create(self, validated_data):
@@ -93,17 +92,16 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 class PinSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
-    category = serializers.SerializerMethodField('category_map')
     pinsize = serializers.SerializerMethodField('size')
 
-    def category_map(self, article):
-        return {
-            'Science': 'science',
-            'Health': 'health',
-            'Job Market': 'economy',
-            'World': 'world',
-            'Workplace': 'conflict'
-        }.get(article.articlecategory, 'world')
+    # def category_map(self, article):
+    #     return {
+    #         'Science': 'science',
+    #         'Health': 'health',
+    #         'Job Market': 'economy',
+    #         'World': 'world',
+    #         'Workplace': 'conflict'
+    #     }.get(article.articlecategory, 'world')
 
     def size(self, article):
         # pprint(getattr(self.context['view'], 'max_retweetcount'))
@@ -132,20 +130,19 @@ class PinSerializer(serializers.ModelSerializer):
 
 class PinDetailSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
-    category = serializers.SerializerMethodField('category_map')
     keywords = KeywordSerializer(many=True)
     images = ImageSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
     facebookcounts = FacebookCountSerializer(many=True)
 
-    def category_map(self, article):
-        return {
-            'Science': 'science',
-            'Health': 'health',
-            'Job Market': 'economy',
-            'World': 'world',
-            'Workplace': 'conflict'
-        }.get(article.articlecategory, 'world')
+    # def category_map(self, article):
+    #     return {
+    #         'Science': 'science',
+    #         'Health': 'health',
+    #         'Job Market': 'economy',
+    #         'World': 'world',
+    #         'Workplace': 'conflict'
+    #     }.get(article.articlecategory, 'world')
 
     class Meta:
         model = Article
