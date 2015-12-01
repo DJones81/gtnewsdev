@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route
-from rest_framework.filters import DjangoFilterBackend,  OrderingFilter
-from rest_framework_word_filter import FullWordSearchFilter
+from rest_framework.filters import DjangoFilterBackend, SearchFilter, OrderingFilter
+# from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
 
 from django_filters import FilterSet, DateTimeFilter, NumberFilter
@@ -14,7 +14,7 @@ from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer
 
 from django.db.models import Max, Min, F # Avg, StdDev
 
-from pprint import pprint
+# from pprint import pprint
 
 class ArticleFilter(FilterSet):
 
@@ -41,9 +41,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.distinct()
     serializer_class = ArticleSerializer
     bbox_filter_field = 'coords'
-    word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
+    search_fields = ('headline','abstract','byline','keywords__keyword') #,'authors__first','authors__last')
     filter_class = ArticleFilter
-    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, InBBoxFilter, OrderingFilter)
     ordering_fields = ('retweetcount', 'sharecount', 'date', 'id')
     bbox_filter_include_overlapping = True
 
@@ -56,9 +56,9 @@ class PinViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Article.objects.exclude(coords__exact = "{ \"type\": \"Point\", \"coordinates\": [ 0, 0 ] }").distinct()
     serializer_class = PinSerializer
     bbox_filter_field = 'coords'
-    word_fields = ('headline','abstract','keywords__keyword') #,'authors__first','authors__last')
+    search_fields = ('headline','abstract','byline','keywords__keyword') #,'authors__first','authors__last')
     filter_class = PinFilter
-    filter_backends = (DjangoFilterBackend, FullWordSearchFilter, InBBoxFilter, OrderingFilter)
+    filter_backends = (DjangoFilterBackend, SearchFilter, InBBoxFilter, OrderingFilter)
     ordering_fields = ('retweetcount', 'sharecount', 'date')
     bbox_filter_include_overlapping = True
 
