@@ -7,7 +7,8 @@ from rest_framework.filters import DjangoFilterBackend, SearchFilter, OrderingFi
 # from rest_framework_word_filter import FullWordSearchFilter
 from rest_framework_gis.filters import InBBoxFilter
 
-from django_filters import FilterSet, DateTimeFilter, NumberFilter
+from django_filters import FilterSet, DateTimeFilter, NumberFilter, Filter
+from django_filters.fields import Lookup
 
 from gtnewsdev.geonewsapi.models import Article
 from gtnewsdev.geonewsapi.serializers import ArticleSerializer, PinSerializer, PinDetailSerializer
@@ -16,8 +17,13 @@ from django.db.models import Max, Min, F # Avg, StdDev
 
 # from pprint import pprint
 
-class ArticleFilter(FilterSet):
+class ListFilter(Filter):
+    def filter(self, qs, value):
+        value_list = value.split(u',')
+        return super(ListFilter, self).filter(qs, Lookup(value_list, 'in'))
 
+class ArticleFilter(FilterSet):
+    category = ListFilter(name='category')
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
     min_retweetcount = NumberFilter(name='retweetcount',lookup_type='gte')
@@ -25,9 +31,10 @@ class ArticleFilter(FilterSet):
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date', 'sourceid', 'url', 'min_retweetcount', 'min_sharecount']
+        fields = ['start_date', 'end_date', 'sourceid', 'url', 'min_retweetcount', 'min_sharecount', 'category']
 
 class PinFilter(FilterSet):
+    category = ListFilter(name='category')
     start_date = DateTimeFilter(name='date',lookup_type='gte')
     end_date = DateTimeFilter(name='date',lookup_type='lte')
     min_retweetcount = NumberFilter(name='retweetcount',lookup_type='gte')
@@ -35,7 +42,7 @@ class PinFilter(FilterSet):
 
     class Meta:
         model = Article
-        fields = ['start_date', 'end_date', 'min_retweetcount', 'min_sharecount']
+        fields = ['start_date', 'end_date', 'min_retweetcount', 'min_sharecount', 'category']
 
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.distinct()

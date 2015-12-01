@@ -9,7 +9,7 @@ class Article(models.Model):
     abstract = models.CharField(max_length=500, blank=True)
     byline = models.CharField(max_length=100)
     sectionname = models.CharField(max_length=28)
-    category = models.CharField(max_length=10, blank=True)
+    category = models.CharField(max_length=20, blank=True)
     url = models.URLField(max_length=300, unique=True)
     retweetcount = models.IntegerField()
     sharecount = models.IntegerField()
