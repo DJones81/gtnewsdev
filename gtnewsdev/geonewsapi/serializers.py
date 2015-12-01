@@ -16,12 +16,6 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ('url', )
 
-
-# class AuthorSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Author
-#         fields = ('first', 'last')
-
 class RetweetCountSerializer(serializers.ModelSerializer):
     class Meta:
         model = RetweetCount
@@ -36,7 +30,6 @@ class ArticleSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     keywords = KeywordSerializer(many=True)
     images = ImageSerializer(many=True)
-    # authors = AuthorSerializer(many=True)
     retweetcounts = RetweetCountSerializer(many=True)
     facebookcounts = FacebookCountSerializer(many=True)
     category = serializers.CharField(source='articlecategory')
@@ -47,10 +40,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         geo_field = 'coords'
 
     def create(self, validated_data):
-        # print >>sys.stderr, validated_data
         keywords_data = validated_data.pop('keywords')
         images_data = validated_data.pop('images')
-        # authors_data = validated_data.pop('authors')
         retweetcounts_data = validated_data.pop('retweetcounts')
         facebookcounts_data = validated_data.pop('facebookcounts')
         article = Article.objects.create(**validated_data)
@@ -58,8 +49,6 @@ class ArticleSerializer(serializers.ModelSerializer):
             Keyword.objects.create(article=article, **keyword_data)
         for image_data in images_data:
             Image.objects.create(article=article, **image_data)
-        # for author_data in authors_data:
-            # Author.objects.create(article=article, **author_data)
         for retweetcount_data in retweetcounts_data:
             RetweetCount.objects.create(article=article, **retweetcount_data)
         for facebookcount_data in facebookcounts_data:
@@ -67,20 +56,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         return article
 
     def update(self, instance, validated_data):
-#        print >>sys.stderr, instance
-#        print >>sys.stderr, validated_data
         keywordlist = validated_data.pop('keywords')
         imagelist = validated_data.pop('images')
-        # authorlist = validated_data.pop('authors')
         retweetcountlist = validated_data.pop('retweetcounts')
         facebookcountlist = validated_data.pop('facebookcounts')
-#        logger.error('instance:')
-#        logger.error(instance)
-#        logger.error('validated_data:')
-#        logger.error(validated_data)
-#        logger.error('keywords')
-#        logger.error(keywordlist)
-#        instance.update(title='BBBB');
         Article.objects.filter(pk=instance.id).update(**validated_data)
         keywords = [keyword['keyword'] for keyword in keywordlist]
         for keyword in instance.keywords.all():
@@ -95,13 +74,6 @@ class ArticleSerializer(serializers.ModelSerializer):
                 Image.objects.get(pk=image.id).delete()
         for image in imagelist:
             Image.objects.get_or_create(article=instance, **image)
-        # authorsfirsts = [author['first'] for author in authorlist]
-        # authorslasts = [author['last'] for author in authorlist]
-        # for author in instance.authors.all():
-        #     if not (author.first in authorsfirsts and author.last in authorslasts):
-        #         Author.objects.get(pk=author.id).delete()
-        # for author in authorlist:
-        #     Author.objects.get_or_create(article=instance, **author)
         retweetcountids = []
         for retweetcount in retweetcountlist:
             retweetcountobj, created = RetweetCount.objects.get_or_create(article=instance, **retweetcount)
@@ -122,9 +94,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 class PinSerializer(serializers.ModelSerializer):
     coords = geoserializers.GeometryField(label=('coordinates'))
     category = serializers.SerializerMethodField('category_map')
-    #isgeolocated = serializers.SerializerMethodField('islocated')
     pinsize = serializers.SerializerMethodField('size')
-    # authors = AuthorSerializer(many=True)
 
     def category_map(self, article):
         return {
@@ -155,14 +125,29 @@ class PinSerializer(serializers.ModelSerializer):
         # print(Article.objects.filter(self.context['request'].GET))
         return pinsize
 
-
-    # retweetcount = serializers.SlugRelatedField(
-    #         queryset=Article.objects.retweetcounts.latest('date'),
-    #         read_only=true,
-    #         slug_field='retweetcount'
-    #     )
-
     class Meta:
         model = Article
         fields = ('pk', 'date', 'coords', 'pinsize', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount', 'sharecount')
+        geo_field = 'coords'
+
+class PinDetailSerializer(serializers.ModelSerializer):
+    coords = geoserializers.GeometryField(label=('coordinates'))
+    category = serializers.SerializerMethodField('category_map')
+    keywords = KeywordSerializer(many=True)
+    images = ImageSerializer(many=True)
+    retweetcounts = RetweetCountSerializer(many=True)
+    facebookcounts = FacebookCountSerializer(many=True)
+
+    def category_map(self, article):
+        return {
+            'Science': 'science',
+            'Health': 'health',
+            'Job Market': 'economy',
+            'World': 'world',
+            'Workplace': 'conflict'
+        }.get(article.articlecategory, 'world')
+
+    class Meta:
+        model = Article
+        fields = ('pk', 'date', 'coords', 'headline', 'abstract', 'byline', 'url', 'category', 'retweetcount', 'sharecount', 'keywords', 'retweetcounts', 'facebookcounts', 'images')
         geo_field = 'coords'
